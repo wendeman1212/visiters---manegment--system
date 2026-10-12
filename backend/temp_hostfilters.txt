@@ -1,0 +1,132 @@
+106|const MAIN_TABS = [
+107|    { key: 'dashboard', label: 'Dashboard', icon: 'home' },
+108|    { key: 'requests', label: 'Requests', icon: 'clipboard' },
+109|    { key: 'appointments', label: 'Appointments', icon: 'calendar' },
+110|    { key: 'host_change', label: 'Host Change', icon: 'users' },
+111|    { key: 'visitors', label: 'Visitors', icon: 'user' },
+112|    { key: 'arrival', label: 'Arrival', icon: 'exit' },
+113|    { key: 'during', label: 'During Visit', icon: 'handshake' },
+114|    { key: 'facility', label: 'Facility', icon: 'building' },
+115|    { key: 'completion', label: 'Completion', icon: 'check' },
+116|    { key: 'analytics', label: 'Analytics', icon: 'chart' },
+117|    { key: 'messages', label: 'Messages', icon: 'mail' },
+120|export default function HostDashboard({ visits, all_hosts, transfer_recipients, reschedule_requests, today_stats, analytics, notifications, section, messages_inbox, messages_sent, messages_r..[294]
+127|    const [reqTab, setReqTab] = useState('pending');
+171|        router.post(`/visit-requests/${v.id}/host-decision`, {
+210|    const filterVisits = (group) => visits.filter(v => {
+211|        if (group === 'pending') return v.status === 'pending';
+212|        if (group === 'approved') return v.status === 'approved';
+213|        if (group === 'checked_in') return v.status === 'checked_in';
+215|        if (group === 'upcoming') return v.status === 'approved' && new Date(v.requested_time) > new Date();
+225|        router.post(`/visit-requests/${id}/host-decision`, { decision, comments, ...extra },
+239|        router.post(`/visit-requests/${id}/update-time`, { requested_time: serverTime, duration: s.duration },
+245|        const ids = filterVisits(group).map(v => v.id);
+282|                    <button onClick={() => router.get('/visit-requests/process-sla')} className="btn btn-secondary" style={{ fontSize: '11px', padding: '6px 12px' }}> SLA</button>
+321|                            {MAIN_TABS.map(t => {
+322|                            const badge = t.key === 'requests' ? filterVisits('pending').length
+323|                                : t.key === 'arrival' ? filterVisits('approved').filter(v => new Date(v.requested_time) <= new Date(Date.now() + 3600000)).length
+324|                                    : t.key === 'host_change' ? (pending_host_change_requests || []).length
+330|                                            background: tab === t.key ? 'rgba(255,255,255,0.2)' : 'transparent',
+332|                                            padding: sidebarOpen ? '10px 14px' : '10px 0', fontSize: '13px', fontWeight: tab === t.key ? 700 : 500,
+369|                    {tab === 'dashboard' && (
+372|                                <StatCard label="Pending Requests" value={today_stats.pending} color="warning" icon="clock" />
+385|                                {filterVisits('upcoming').length === 0 ? (
+389|                                        {filterVisits('upcoming').map(v => (
+409|                            {filterVisits('checked_in').length > 0 && (
+412|                                        <SectionTitle style={{ margin: 0 }}> Visitor Arrivals — {filterVisits('checked_in').length} on-site</SectionTitle>
+416|                                        {filterVisits('checked_in').map(v => (
+433|                                                    <button onClick={() => setTab('arrival')} className="btn btn-primary" style={{ fontSize: 12, padding: '7px 16px', background: 'linear-grad..[269]
+444|                    {tab === 'requests' && (
+447|                                {[['pending', 'Pending'], ['approved', 'Approved'], ['checked_in', 'Active'], ['completed', 'Completed'], ['missed', 'No-Show'], ['all', 'All']].map(([k, l]) ..[194]
+448|                                    <TabBtn key={k} active={reqTab === k} onClick={() => setReqTab(k)} badge={k === 'pending' ? filterVisits('pending').length : 0}>{l}</TabBtn>
+452|                            {/* Bulk actions for pending */}
+453|                            {reqTab === 'pending' && filterVisits('pending').length > 0 && (
+456|                                    <button onClick={() => selectAll('pending')} className="btn btn-secondary" style={{ fontSize: 11, padding: '4px 10px' }}> All</button>
+468|                                {filterVisits(reqTab).length === 0 ? (
+470|                                ) : filterVisits(reqTab).map(v => (
+474|                                                {reqTab === 'pending' && <input type="checkbox" checked={selectedIds.includes(v.id)} onChange={() => toggleSelect(v.id)} style={{ marginTop: 4..[197]
+531|                                                                        {expandedCompany[v.id] ? <> Collapse</> : (v.status === 'pending' ? <> Hide</> : <> Details</>)}
+541|                                                                        { label: 'Company Name', value: v.company_name, icon: 'building' },
+542|                                                                        { label: 'Email', value: v.company_email, icon: 'email' },
+543|                                                                        { label: 'Phone', value: v.company_phone, icon: 'phone' },
+544|                                                                        { label: 'Address', value: v.company_address, icon: 'location' },
+545|                                                                        { label: 'Website', value: v.company_website, icon: 'globe', link: true },
+599|                                                                    {v.status === 'approved' && (
+609|                                                            {/* Expanded Section: Group Members + Documents (always visible for pending visits) */}
+610|                                                            {(expandedCompany[v.id] || v.status === 'pending') && (
+627|                                                                                        { label: 'Total', value: groupValidation[v.id].summary.total, color: 'var(--text-primary)', bg: 'rgba(..[211]
+628|                                                                                        { label: 'Cleared', value: groupValidation[v.id].summary.cleared, color: '#10b981', bg: 'rgba(16,185,1..[201]
+629|                                                                                        { label: 'Watchlist', value: groupValidation[v.id].summary.warning, color: '#f59e0b', bg: 'rgba(245,15..[203]
+630|                                                                                        { label: 'Blocked', value: groupValidation[v.id].summary.blocked, color: '#ef4444', bg: 'rgba(239,68,6..[200]
+672|                                                                                                        const colors = { cleared: { bg: 'rgba(16,185,129,0.12)', color: '#10b981', label: 'CLE..[357]
+685|                                                                                            const statusColors = { cleared: { bg: 'rgba(16,185,129,0.12)', color: '#10b981', label: 'CLEARED' ..[351]
+688|                                                                                                <tr key={i} style={{ background: status === 'blocked' ? 'rgba(239,68,68,0.04)' : status === 'w..[243]
+843|                                        {v.status === 'pending' && !appointmentPassed(v) && (
+853|                                                {/* Reschedule button for pending visits */}
+862|                                        {/* Edit time for pending */}
+863|                                        {v.status === 'pending' && !appointmentPassed(v) && (
+880|                                        {v.status === 'approved' && (
+897|                    {tab === 'appointments' && (
+908|                                    {filterVisits('today').length === 0 ? (
+910|                                    ) : filterVisits('today').map(v => (
+911|                                        <div key={v.id} style={{ display: 'flex', gap: 16, alignItems: 'center', padding: '12px 16px', borderRadius: 10, background: v.status === 'checked_in'..[290]
+930|                                {filterVisits('upcoming').length === 0 ? (
+931|                                    <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>No upcoming approved appointments.</p>
+937|                                                {filterVisits('upcoming').map(v => (
+957|                    {tab === 'host_change' && (
+961|                                <SectionTitle>Incoming Transfer Requests ({(pending_host_change_requests || []).length})</SectionTitle>
+962|                                {!(pending_host_change_requests || []).length ? (
+963|                                    <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>No pending transfer requests assigned to you.</p>
+966|                                        {(pending_host_change_requests || []).map(r => (
+972|                                                            <span className="badge badge-pending" style={{ fontSize: 10 }}>pending</span>
+974|                                                                {r.visit_request?.status === 'pending' ? 'Pre-Approval' : 'Active Visit'}
+996|                                                        <button onClick={() => { const notes = prompt('Accept notes (optional):'); router.post(`/host-change-requests/${r.id}/accept`, { revie..[307]
+997|                                                        <button onClick={() => { const notes = prompt('Rejection reason:'); if (notes !== null) router.post(`/host-change-requests/${r.id}/rej..[313]
+1011|                                    {filterVisits('pending').concat(filterVisits('approved')).concat(filterVisits('checked_in')).slice(0, 10).map(v => (
+1021|                                    {filterVisits('pending').length + filterVisits('approved').length + filterVisits('checked_in').length === 0 && (
+1029|                                <SectionTitle>My Transfer Request History ({(my_host_change_requests || []).length})</SectionTitle>
+1030|                                {!(my_host_change_requests || []).length ? (
+1031|                                    <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>No host change requests submitted yet.</p>
+1034|                                        {(my_host_change_requests || []).map(r => (
+1035|                                            <div key={r.id} style={{ padding: '12px 16px', borderRadius: 8, background: 'rgba(255,255,255,0.02)', border: `1px solid ${r.status === 'accepted'..[349]
+1038|                                                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: r.status === 'accepted' ? 'rgba(16,185,129,0.15)' : r.statu..[482]
+1046|                                                {r.status === 'pending' && (
+1047|                                                    <button onClick={() => router.post(`/host-change-requests/${r.id}/cancel`)} className="btn btn-danger" style={{ fontSize: 10, padding: '3p..[230]
+1058|                    {tab === 'visitors' && (
+1061|                            {filterVisits('vip').length > 0 && (
+1065|                                        {filterVisits('vip').map(v => (
+1078|                            {/* All visitors history table */}
+1126|                    {tab === 'arrival' && (
+1128|                            {/* Expected arrivals (approved, not yet arrived) */}
+1130|                                <SectionTitle> Expected Arrivals — {filterVisits('approved').length}</SectionTitle>
+1131|                                {filterVisits('approved').length === 0 ? (
+1135|                                        {filterVisits('approved').map(v => (
+1148|                                                    <button onClick={() => router.post(`/host/visits/${v.id}/confirm-arrival`)} className="btn btn-primary" style={{ fontSize: 11, padding: '5..[219]
+1159|                    {tab === 'during' && (
+1161|                            {filterVisits('checked_in').length > 0 && (
+1163|                                    <SectionTitle> Active Meetings ({filterVisits('checked_in').length})</SectionTitle>
+1166|                                            if (!confirm(`Delete ALL ${filterVisits('checked_in').length} active visitor(s)? This permanently removes the visits, QR passes, and all related r..[231]
+1176|                            {filterVisits('checked_in').length === 0 ? (
+1181|                            ) : filterVisits('checked_in').map(v => (
+1256|                                                    <button onClick={() => { router.post(`/visit-requests/${v.id}/transfer`, { visit_request_id: v.id, new_host_id: transferHost.id, reason: t..[359]
+1287|                            {filterVisits('completed').length > 0 && (
+1294|                                                {filterVisits('completed').map(v => (
+1312|                    {tab === 'facility' && (
+1364|                                            {visits.filter(v => ['pending', 'approved', 'checked_in'].includes(v.status)).map(v => (
+1377|                                                            onChange={({ building, floor, room }) => router.post(`/visit-requests/${v.id}/assign-room`, { building, floor, meeting_room_id: ro..[196]
+1390|                    {tab === 'completion' && (
+1394|                                {filterVisits('checked_in').length === 0 ? (
+1396|                                ) : filterVisits('checked_in').map(v => (
+1436|                                            {filterVisits('completed').slice(0, 15).map(v => (
+1459|                    {tab === 'analytics' && (
+1464|                                const approvedCount = visits.filter(v => v.status === 'approved').length;
+1465|                                const rejectedCount = visits.filter(v => v.status === 'rejected').length;
+1466|                                const archivedCount = visits.filter(v => v.status === 'archived').length;
+1503|                                        ['Pending', visits.filter(v => v.status === 'pending').length, 'warning'],
+1504|                                        ['Approved', visits.filter(v => v.status === 'approved').length, 'emerald'],
+1505|                                        ['Checked In', visits.filter(v => v.status === 'checked_in').length, 'cyan'],
+1507|                                        ['Rejected', visits.filter(v => v.status === 'rejected').length, 'danger'],
+1508|                                        ['Escalated', visits.filter(v => v.status === 'escalated').length, 'warning'],
+1544|                    {tab === 'messages' && (
+1573|                            router.post(`/visit-requests/${hostReschedModal.id}/request-reschedule`, {
+1621|                            router.post('/host-change-requests', {

@@ -1,0 +1,57 @@
+119|
+120|export default function HostDashboard({ visits, all_hosts, transfer_recipients, reschedule_requests, today_stats, analytics, notifications, section, messages_inbox, messages_sent, messages_r..[294]
+121|    const { auth, app_timezone } = usePage().props;
+122|    const host = auth.user;
+123|    const tz = app_timezone || 'Africa/Addis_Ababa';
+124|
+125|    const [tab, setTab] = useState(section || 'dashboard');
+126|    const [sidebarOpen, setSidebarOpen] = useState(true);
+127|    const [reqTab, setReqTab] = useState('pending');
+128|    const [selectedIds, setSelectedIds] = useState([]);
+129|    const [comments, setComments] = useState('');
+130|    const [editOpen, setEditOpen] = useState({});
+131|    const [editState, setEditState] = useState({});
+132|    const [notesOpen, setNotesOpen] = useState({});
+133|    const [notesState, setNotesState] = useState({});
+134|    const [extendId, setExtendId] = useState(null);
+135|    const [extraMins, setExtraMins] = useState(30);
+136|    const [outcomeOpen, setOutcomeOpen] = useState({});
+137|    const [outcomeText, setOutcomeText] = useState({});
+138|    const [transferOpen, setTransferOpen] = useState({});
+139|    const [transferHost, setTransferHost] = useState(null);
+140|    const [transferReason, setTransferReason] = useState('');
+141|    const [bulkReason, setBulkReason] = useState('');
+142|    const [facForm, setFacForm] = useState({ building: '', floor: '', room: '' });
+143|    const [editingFacId, setEditingFacId] = useState(null);
+144|    const [facEditForm, setFacEditForm] = useState({ building: '', floor: '', room: '' });
+145|    const [groupValidation, setGroupValidation] = useState({});
+146|    const [groupValidating, setGroupValidating] = useState({});
+147|    const [expandedCompany, setExpandedCompany] = useState({});
+148|    const [hostReschedModal, setHostReschedModal] = useState(null);
+149|    const [hostReschedForm, setHostReschedForm] = useState({ new_requested_time: '', new_duration: 60, reason: '' });
+150|
+151|    // Escalation state
+152|    const [escModal, setEscModal] = useState(null);
+153|    const [escTarget, setEscTarget] = useState('');
+154|    const [escReason, setEscReason] = useState('');
+155|
+156|    // Eligible escalation targets: active Admin/CEO of the visitor's company.
+157|    const eligibleEscalationTargets = (visit) => {
+158|        const list = transfer_recipients || [];
+159|        const companyId = visit?.company_id;
+160|        return list.filter(u => (u.role === 'admin' || u.role === 'ceo') && u.status !== 'suspended' && (companyId ? u.company_id === companyId : true));
+161|    };
+162|
+163|    const openEscalate = (v) => {
+164|        setEscModal(v);
+165|        setEscTarget('');
+166|        setEscReason('');
+167|    };
+168|
+169|    const submitEscalate = (v) => {
+170|        if (!escTarget) { alert('Please select an Admin or CEO to escalate to.'); return; }
+171|        router.post(`/visit-requests/${v.id}/host-decision`, {
+172|            decision: 'escalate',
+173|            escalated_to: escTarget,
+174|            reason: escReason,
+175|        }, { onSuccess: () => setEscModal(null) });

@@ -1,0 +1,12 @@
+
+[A: co3 br2 Business Meeting] POST /request-visit -> 302
+  302 -> http://127.0.0.1:3255/request-visit
+
+[B: co3 no-branch Business Meeting] POST /request-visit -> 302
+  302 -> http://127.0.0.1:3255/request-visit
+
+[C: co10 ENSA Business Meeting] POST /request-visit -> 302
+  302 -> http://127.0.0.1:3255/request-visit
+
+[D: no company no branch Business Meeting] POST /request-visit -> 302
+  302 -> http://127.0.0.1:3255/request-visit

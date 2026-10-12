@@ -1,0 +1,37 @@
+created visit #135
+GET /login -> 200, cookies: ["XSRF-TOKEN","laravel-session"]
+POST /login -> 302, body: <!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+POST transfer -> 302 body: <!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='ht
+after transfer: host=33 status=pending
+logout -> 302
+login as hostB -> 302
+GET /host/dashboard -> 200, content-len=50039
+  data-page pos: 1246
+  around: </script>    </head>
+<body>
+    <script data-page="app" type="application/json">{"component":"Dashboard\/Host","props":{"errors":{},"auth":{"user":{"id":33,"name":"tale","email":"tale@gmail.com","phon
+  version=6b0541a71a182257aa00ff56f55cdd2e visit-count=15
+  #107 status=pending host=33 req_time=2026-08-10T18:04:44.000000Z is_no_show=false
+  #114 status=pending host=33 req_time=2026-08-10T18:22:37.000000Z is_no_show=false
+  #120 status=pending host=33 req_time=2026-08-10T18:27:40.000000Z is_no_show=false
+  #121 status=pending host=33 req_time=2026-08-10T18:27:41.000000Z is_no_show=false
+  #122 status=pending host=33 req_time=2026-08-10T18:27:41.000000Z is_no_show=false
+  #129 status=pending host=33 req_time=2026-08-10T18:34:58.000000Z is_no_show=false
+  #130 status=pending host=33 req_time=2026-08-10T18:37:32.000000Z is_no_show=false
+  #131 status=pending host=33 req_time=2026-08-10T18:38:07.000000Z is_no_show=false
+  #132 status=pending host=33 req_time=2026-08-10T18:38:31.000000Z is_no_show=false
+  #133 status=pending host=33 req_time=2026-08-10T18:38:57.000000Z is_no_show=false
+  #134 status=pending host=33 req_time=2026-08-10T18:39:28.000000Z is_no_show=false
+  #135 status=pending host=33 req_time=2026-08-10T18:40:10.000000Z is_no_show=false
+  #116 status=approved host=33 req_time=2026-08-10T18:22:37.000000Z is_no_show=false
+  #123 status=approved host=33 req_time=2026-08-10T18:27:41.000000Z is_no_show=false
+  #99 status=checked_in host=33 req_time=2026-08-09T09:51:00.000000Z is_no_show=false
+  visit#135 in hostB dash: YES

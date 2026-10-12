@@ -1,0 +1,97 @@
+== Companies & branches ==
+co#3 Default Organization active=Y
+    br#1 aal active=Y
+    br#2 main  office active=Y
+co#9 AAI active=Y
+    br#3 ict active=Y
+    br#6 fanaye active=Y
+co#10 ENSA active=Y
+    br#4 ensa park active=Y
+    br#5 ensapark1 active=Y
+co#11 dfgv active=Y
+
+== Hosts (active, role=host) ==
+#8 bine co=3 br=NULL dept=(N/A)
+#10 zed co=3 br=NULL dept=4(Finance & Accounting)
+#12 meki co=3 br=1 dept=4(Finance & Accounting)
+#28 Wendesen Kebede co=9 br=NULL dept=20(finance  and  opration)
+#30 alem co=10 br=NULL dept=(N/A)
+#33 tale co=3 br=1 dept=15(Human Resourse)
+#34 wond co=9 br=3 dept=20(finance  and  opration)
+#36 Tinker User co=NULL br=7 dept=(N/A)
+#45 kmem co=9 br=3 dept=(N/A)
+#46 thj co=9 br=NULL dept=19(human resourse)
+
+== Assignment simulation ==
+OK   co=3 br=1 purpose='Business Meeting' => dept#4(Finance & Accounting) -> host#12(meki,br=1,co=3)
+OK   co=3 br=1 purpose='Job Interview' => dept#15(Human Resourse) -> host#33(tale,br=1,co=3)
+OK   co=3 br=1 purpose='Delivery' => dept#4(Finance & Accounting) -> host#12(meki,br=1,co=3)
+OK   co=3 br=1 purpose='Consultation' => dept#4(Finance & Accounting) -> host#12(meki,br=1,co=3)
+OK   co=3 br=1 purpose='Client Visit' => dept#4(Finance & Accounting) -> host#12(meki,br=1,co=3)
+OK   co=3 br=1 purpose='Government Affairs' => dept#4(Finance & Accounting) -> host#12(meki,br=1,co=3)
+OK   co=3 br=1 purpose='Other' => dept#4(Finance & Accounting) -> host#12(meki,br=1,co=3)
+OK   co=3 br=1 purpose='IT Support' => dept#4(Finance & Accounting) -> host#12(meki,br=1,co=3)
+OK   co=3 br=1 purpose='Finance Meeting' => dept#4(Finance & Accounting) -> host#12(meki,br=1,co=3)
+OK   co=3 br=1 purpose='Security Visit' => dept#4(Finance & Accounting) -> host#12(meki,br=1,co=3)
+OK   co=3 br=2 purpose='Business Meeting' => dept#4(Finance & Accounting) -> host#10(zed,br=NULL,co=3)
+OK   co=3 br=2 purpose='Job Interview' => dept#15(Human Resourse) -> host#33(tale,br=1,co=3)
+OK   co=3 br=2 purpose='Delivery' => dept#4(Finance & Accounting) -> host#10(zed,br=NULL,co=3)
+OK   co=3 br=2 purpose='Consultation' => dept#4(Finance & Accounting) -> host#10(zed,br=NULL,co=3)
+OK   co=3 br=2 purpose='Client Visit' => dept#4(Finance & Accounting) -> host#10(zed,br=NULL,co=3)
+OK   co=3 br=2 purpose='Government Affairs' => dept#4(Finance & Accounting) -> host#10(zed,br=NULL,co=3)
+OK   co=3 br=2 purpose='Other' => dept#4(Finance & Accounting) -> host#10(zed,br=NULL,co=3)
+OK   co=3 br=2 purpose='IT Support' => dept#4(Finance & Accounting) -> host#10(zed,br=NULL,co=3)
+OK   co=3 br=2 purpose='Finance Meeting' => dept#4(Finance & Accounting) -> host#10(zed,br=NULL,co=3)
+OK   co=3 br=2 purpose='Security Visit' => dept#4(Finance & Accounting) -> host#10(zed,br=NULL,co=3)
+OK   co=9 br=3 purpose='Business Meeting' => dept#20(finance  and  opration) -> host#34(wond,br=3,co=9)
+OK   co=9 br=3 purpose='Job Interview' => dept#19(human resourse) -> host#46(thj,br=NULL,co=9)
+OK   co=9 br=3 purpose='Delivery' => dept#20(finance  and  opration) -> host#34(wond,br=3,co=9)
+OK   co=9 br=3 purpose='Consultation' => dept#20(finance  and  opration) -> host#34(wond,br=3,co=9)
+OK   co=9 br=3 purpose='Client Visit' => dept#20(finance  and  opration) -> host#34(wond,br=3,co=9)
+OK   co=9 br=3 purpose='Government Affairs' => dept#20(finance  and  opration) -> host#34(wond,br=3,co=9)
+OK   co=9 br=3 purpose='Other' => dept#20(finance  and  opration) -> host#34(wond,br=3,co=9)
+OK   co=9 br=3 purpose='IT Support' => dept#20(finance  and  opration) -> host#34(wond,br=3,co=9)
+OK   co=9 br=3 purpose='Finance Meeting' => dept#20(finance  and  opration) -> host#34(wond,br=3,co=9)
+OK   co=9 br=3 purpose='Security Visit' => dept#20(finance  and  opration) -> host#34(wond,br=3,co=9)
+OK   co=9 br=6 purpose='Business Meeting' => dept#19(human resourse) -> host#46(thj,br=NULL,co=9)
+OK   co=9 br=6 purpose='Job Interview' => dept#19(human resourse) -> host#46(thj,br=NULL,co=9)
+OK   co=9 br=6 purpose='Delivery' => dept#19(human resourse) -> host#46(thj,br=NULL,co=9)
+OK   co=9 br=6 purpose='Consultation' => dept#20(finance  and  opration) -> host#28(Wendesen Kebede,br=NULL,co=9)
+OK   co=9 br=6 purpose='Client Visit' => dept#20(finance  and  opration) -> host#28(Wendesen Kebede,br=NULL,co=9)
+OK   co=9 br=6 purpose='Government Affairs' => dept#19(human resourse) -> host#46(thj,br=NULL,co=9)
+OK   co=9 br=6 purpose='Other' => dept#19(human resourse) -> host#46(thj,br=NULL,co=9)
+OK   co=9 br=6 purpose='IT Support' => dept#19(human resourse) -> host#46(thj,br=NULL,co=9)
+OK   co=9 br=6 purpose='Finance Meeting' => dept#20(finance  and  opration) -> host#28(Wendesen Kebede,br=NULL,co=9)
+OK   co=9 br=6 purpose='Security Visit' => dept#19(human resourse) -> host#46(thj,br=NULL,co=9)
+FAIL co=10 br=4 purpose='Business Meeting' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=4 purpose='Job Interview' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=4 purpose='Delivery' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=4 purpose='Consultation' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=4 purpose='Client Visit' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=4 purpose='Government Affairs' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=4 purpose='Other' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=4 purpose='IT Support' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=4 purpose='Finance Meeting' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=4 purpose='Security Visit' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=5 purpose='Business Meeting' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=5 purpose='Job Interview' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=5 purpose='Delivery' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=5 purpose='Consultation' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=5 purpose='Client Visit' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=5 purpose='Government Affairs' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=5 purpose='Other' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=5 purpose='IT Support' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=5 purpose='Finance Meeting' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=10 br=5 purpose='Security Visit' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=11 br=NULL purpose='Business Meeting' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=11 br=NULL purpose='Job Interview' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=11 br=NULL purpose='Delivery' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=11 br=NULL purpose='Consultation' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=11 br=NULL purpose='Client Visit' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=11 br=NULL purpose='Government Affairs' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=11 br=NULL purpose='Other' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=11 br=NULL purpose='IT Support' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=11 br=NULL purpose='Finance Meeting' => FAIL: No departments available for the selected company. Please contact the Administrator.
+FAIL co=11 br=NULL purpose='Security Visit' => FAIL: No departments available for the selected company. Please contact the Administrator.
+
+Total=70 failures=30

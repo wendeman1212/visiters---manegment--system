@@ -1,0 +1,4 @@
+POST /request-visit (co3 br2) -> 302
+visit #140 status=pending host=10(zed,br=NULL) req_br=2 req_co=3
+login as zed@gmail.com -> 302
+assigned-host dashboard visits=4 | visit#140 visible: YES

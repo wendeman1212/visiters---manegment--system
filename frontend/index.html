@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+                                                                                                                                                                                                                            <html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Advanced Visitor Management System (VMS) for corporate sites and campuses. Secure, auditable, and automated.">
+
+    <title>VMS Enterprise</title>
+
+    <!-- Fonts are self-hosted (see resources/css/fonts.css) — no internet/CDN required. -->
+</head>
+<body>
+    <div id="app">
+        <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0a0e1a;color:#e2e8f0;font-family:'Inter',sans-serif;">
+            <div style="text-align:center;max-width:400px;padding:40px;">
+                <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;margin:0 auto 24px auto;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div style="font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;font-family:'Outfit',sans-serif;">VMS Enterprise</div>
+                <div style="font-size:14px;color:#94a3b8;margin-bottom:24px;">Connecting to Visitor Management System...</div>
+                <div style="width:48px;height:4px;border-radius:2px;background:rgba(99,102,241,0.2);margin:0 auto;overflow:hidden;">
+                    <div style="width:50%;height:100%;background:#6366f1;border-radius:2px;animation:loading 1.2s ease-in-out infinite;"></div>
+                </div>
+                <style>{`@keyframes loading{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}`}</style>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+[casea] no visitor created
+[caseb] visit #137 status=pending host=10(zed,br=NULL,co=3) req_br=NULL req_co=3
+[casec] no visitor created
+[cased] visit #138 status=pending host=10(zed,br=NULL,co=3) req_br=NULL req_co=3

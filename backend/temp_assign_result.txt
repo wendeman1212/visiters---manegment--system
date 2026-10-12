@@ -1,0 +1,33 @@
+GET /request-visit -> 200, cookies: ["XSRF-TOKEN","laravel-session"]
+POST /request-visit payload: {"visit_type":"individual","visitor_name":"Assign Test Visitor 4432","id_document_no":"629995","visitor_email":"assign4457@test.com","visitor_phone":"0911812980","company_id":3,"branch_id":1,"purpose":"Business Meeting","requested_time":"2026-08-12T10:30","duration":60}
+POST /request-visit -> 302, body: 
+
+    
+        
+        
+
+        Redirecting to http://127.0.0.1:3255/request-visit
+    
+    
+        Redirecting to http://127.0.0.1:3255/request-visit.
+    
+
+Redirect to: HTTP/1.1 302 Found
+Host: 127.0.0.1:3255
+Connection: close
+X-Powered-By: PHP/8.2.12
+Cache-Control: no-cache, private
+Date: Sun, 09 Aug 2026 18:55:31 GMT
+Location: http://127.0.0.1:3255/request-visit
+Content-Type: text/html; charset=utf-8
+Vary: X-Inertia
+Set-Cookie: XSRF-TOKEN=eyJpdiI6IkZDMWcvdHZmL044ZUswUHB0ODRWc3c9PSIsInZhbHVlIjoiblhjZFVaZ2lpUmJ5emlXOWlXcnhxUm0xQVhzaTZWSUgwck1KQ0loSnJPQ2lSMWFSd3lSRzF5ZmVSNDN5cWxIZzlwWXhDS2tObzV1NmdYOStScVp0ZmR1ZWE0MlBVTFhYUS84UDhyNW9ueG1ETS9nQ2UzTStIYVRvNVYvZCtqTjIiLCJtYWMiOiIwYmI2MDkwMDAzOWRlYWQ3YWJlZmZhYmRmNTNjOWU0Y2Y2OTAyN2IwNWNiM2ViYzY0NzBiYzFjY2I3YmUyYWJiIiwidGFnIjoiIn0%3D; expires=Sun, 09 Aug 2026 20:55:31 GMT; Max-Age=7200; path=/; samesite=lax
+Set-Cookie: laravel-session=eyJpdiI6IlRJKzJqU3VhcVZXMTVMd2pYblBiQ2c9PSIsInZhbHVlIjoibWtnYk5Cb3B0YzdaMEIxNmtHdTZyNk9MQSsvcmRIQzkwTEFMNkRRR1hVSG9pQ0xUc04wWWI1L0c4R0RySHpvY2xIOSt5dFhVcjlONi9JcTdQWDE4Q0xUM1MxVWpTbTdHUERoTCtBbjVCRjliVmpJRk5rdmFXMy9lcWlxZkZRY2QiLCJtYWMiOiJiYzI2OWY1YWEwN2I1Y2IwZTYxMjg4ODQ5YTFiNTY5MzMyMGI5Mzg5MWE1YTU1NmNlYjkzYTA1MGNlMDRlM2U1IiwidGFnIjoiIn0%3D; expires=Sun, 09 Aug 2026 20:55:31 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+
+
+
+newest visit #136: host_id=12 dept=4 br=1 co=3 status=pending email=assign4457@test.com
+assigned host: #12 meki role=host br=1 dept=4 co=3 status=active
+login as meki@gmail.com -> 302
+dashboard visits=16 | visit#136 visible to assigned host: YES
+  in dash: status=pending req_time=2026-08-12T07:30:00.000000Z is_no_show=false

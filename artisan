@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+
+// Root artisan wrapper - forwards to backend/artisan
+chdir(__DIR__.'/backend');
+require __DIR__.'/backend/artisan';
+
+

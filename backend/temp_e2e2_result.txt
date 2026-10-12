@@ -1,0 +1,16 @@
+CASE A visit #113
+  store: redirect
+  state: host=12 status=pending co=3 br=1 dept=4
+CASE B visit #114
+  store: redirect
+  state: host=33 status=pending co=3 br=1 dept=15
+CASE C visit #115
+  store: redirect
+  state: host=8 status=pending co=3 br=NULL dept=NULL
+CASE D visit #116
+  store: redirect
+  state: host=33 status=pending
+  approve: 302
+  state after approve: host=33 status=approved
+CASE E EX: The visit request id field is required.
+  state after handoff: host=33 alt=NULL status=approved

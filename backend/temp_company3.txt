@@ -1,0 +1,26 @@
+== company 3 roles ==
+#2 selam role=admin br=NULL dept=NULL
+#1 CEO User role=ceo br=NULL dept=NULL
+#8 bine role=host br=NULL dept=NULL
+#10 zed role=host br=NULL dept=4
+#12 meki role=host br=1 dept=4
+#33 tale role=host br=1 dept=15
+#9 any thing ghjn role=security_guard br=NULL dept=NULL
+#13 try yh role=security_guard br=NULL dept=NULL
+
+== branches ==
+#1 aal
+#2 main  office
+
+== departments ==
+#3 Information Technology br=NULL
+#4 Finance & Accounting br=NULL
+#5 Security & Operations br=NULL
+#14 Human Resourse br=1
+#15 Human Resourse br=2
+#16 Information Technology br=2
+#17 Finance & Accounting br=2
+#18 Security & Operations br=2
+#21 Information Technology br=1
+#22 Finance & Accounting br=1
+#23 Security & Operations br=1

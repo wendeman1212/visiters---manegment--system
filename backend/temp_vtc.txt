@@ -1,0 +1,110 @@
+1|<?php
+2|
+3|namespace App\Http\Controllers;
+4|
+5|use App\Models\Branch;
+6|use App\Models\Company;
+7|use App\Models\Department;
+8|use App\Models\VisitRequest;
+9|use App\Models\User;
+10|use App\Services\AuditLogger;
+11|use App\Services\HostTransferService;
+12|use Illuminate\Http\Request;
+13|use Illuminate\Support\Facades\Auth;
+14|use Illuminate\Support\Facades\DB;
+15|
+16|/**
+17| * Visitor Transfer for Company Admin / CEO.
+18| *
+19| * Both roles are company-level users and may transfer a visitor to an eligible
+20| * active Host — or to a company Admin/CEO — within any company they are
+21| * authorized for. The modal follows a Company -> Branch -> Department cascade
+22| * for Hosts. Company Admins/CEOs are company-level recipients and are offered
+23| * as soon as a company is selected (never scoped by branch/department).
+24| * Department lists the branch-scoped departments plus the company-level
+25| * departments (branch_id NULL) so Hosts assigned to company-level departments
+26| * stay reachable. Only eligible Hosts (role 'host', status 'active', assigned
+27| * to the selected department and either company-level or stationed at the
+28| * selected branch) are offered as Host recipients.
+29| *
+30| * Everything is validated against the live database relationships; no users or
+31| * companies are hardcoded. The transfer is an Admin/CEO company-level action so
+32| * it works independently of the Host-side transfer and the escalation flow.
+33| */
+34|class VisitorTransferController extends Controller
+35|{
+36|    /**
+37|     * JSON cascade for the Admin/CEO visitor-transfer modal.
+38|     *
+39|     * Query params (all optional): company_id, branch_id, department_id.
+40|     * - companies:  only the companies the actor is authorized to manage.
+41|     * - branches:   active branches belonging to the selected company.
+42|     * - departments:departments strictly scoped to the selection: branch chosen
+43|     *               -> only that branch's departments; otherwise -> only the
+44|     *               company-level departments (branch_id NULL).
+45|     * - hosts:      eligible active Hosts of the selected company + department
+46|     *               (company-level or stationed at the selected branch),
+47|     *               excluding the current responsible host.
+48|     */
+49|    public function options(Request $request, $id)
+50|    {
+51|        $actor = $this->actorOrAbort();
+52|
+53|        $visit = VisitRequest::withoutGlobalScopes()->findOrFail($id);
+54|
+55|        if (!$actor->hasCompanyAccess($visit->company_id)) {
+56|            abort(403, 'You do not have access to this visit\'s company.');
+57|        }
+58|
+59|        $payload = [
+60|            'companies' => $this->authorizedCompanies($actor),
+61|            'visit'     => [
+62|                'id'            => $visit->id,
+63|                'visitor_name'  => $visit->resolveVisitor()?->name ?? $visit->company_name ?? 'Visitor',
+64|                'company_id'    => $visit->company_id,
+65|                'branch_id'     => $visit->branch_id,
+66|                'department_id' => $visit->department_id,
+67|                'host_id'       => $visit->host_id,
+68|                'status'        => $visit->status,
+69|            ],
+70|            'branches'    => [],
+71|            'departments' => [],
+72|            'hosts'       => [],
+73|            'managers'    => [],
+74|        ];
+75|
+76|        if (!$request->filled('company_id')) {
+77|            return response()->json($payload);
+78|        }
+79|
+80|        $companyId = (int) $request->input('company_id');
+81|        if (!$actor->hasCompanyAccess($companyId)) {
+82|            abort(403, 'You are not authorized for the selected company.');
+83|        }
+84|
+85|        $payload['branches'] = Branch::withoutGlobalScopes()
+86|            ->where('company_id', $companyId)
+87|            ->where('is_active', true)
+88|            ->orderBy('name')
+89|            ->get(['id', 'name']);
+90|
+91|        $branchId = $request->filled('branch_id') ? (int) $request->input('branch_id') : null;
+92|        if ($branchId !== null && !Branch::withoutGlobalScopes()
+93|                ->where('id', $branchId)
+94|                ->where('company_id', $companyId)
+95|                ->exists()) {
+96|            abort(422, 'The selected branch does not belong to this company.');
+97|        }
+98|
+99|        // Departments of the selected company. When a branch is selected, both
+100|        // that branch's departments and the company-level departments
+101|        // (branch_id NULL) are returned, so Hosts assigned to company-level
+102|        // departments stay reachable from any branch (mirrors the host scope).
+103|        // When no branch is selected, only the company-level departments
+104|        // (branch_id NULL) are returned.
+105|        if ($branchId !== null) {
+106|            $payload['departments'] = Department::withoutGlobalScopes()
+107|                ->where('company_id', $companyId)
+108|                ->where(function ($q) use ($branchId) {
+109|                    $q->where('branch_id', $branchId)->orWhereNull('branch_id');
+110|                })

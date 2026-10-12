@@ -1,0 +1,20 @@
+== VisitRequests with host_id set, but scopes would HIDE them from that host's dashboard ==
+(rule: host dashboard requires company_id = host.company_id AND (host.branch_id null OR request.branch_id = host.branch_id))
+
+
+Total hidden-from-host records: 0
+
+== VisitRequests with host_id NULL (never assigned) ==
+count=0
+
+== All hosts (role=host, active) and their dashboard-visible pending count ==
+#8 bine br=NULL co=3 visible_pending=1 total=1
+#10 zed br=NULL co=3 visible_pending=0 total=0
+#12 meki br=1 co=3 visible_pending=15 total=15
+#28 Wendesen Kebede br=NULL co=9 visible_pending=0 total=0
+#30 alem br=NULL co=10 visible_pending=0 total=0
+#33 tale br=1 co=3 visible_pending=12 total=12
+#34 wond br=3 co=9 visible_pending=0 total=0
+#36 Tinker User br=7 co=NULL visible_pending=0 total=0
+#45 kmem br=3 co=9 visible_pending=0 total=0
+#46 thj br=NULL co=9 visible_pending=0 total=0

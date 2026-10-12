@@ -1,0 +1,34 @@
+*.log
+.DS_Store
+Thumbs.db
+
+# Backend
+/backend/.env
+/backend/.env.backup
+/backend/.env.production
+/backend/.phpactor.json
+/backend/.phpunit.result.cache
+/backend/auth.json
+/backend/storage/*.key
+/backend/storage/pail
+/backend/vendor
+/backend/public/hot
+
+# Frontend
+/frontend/node_modules
+
+# Public (stays at root)
+/public/build
+/public/hot
+/public/storage
+
+# IDE
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+
+# Laravel framework
+/.phpunit.cache
+node_modules

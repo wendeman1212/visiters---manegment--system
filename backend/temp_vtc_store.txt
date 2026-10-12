@@ -1,0 +1,155 @@
+161|     */
+162|    public function store(Request $request, $id)
+163|    {
+164|        $actor = $this->actorOrAbort();
+165|
+166|        $data = $request->validate([
+167|            'new_host_id'   => 'required|integer',
+168|            'company_id'    => 'required|integer',
+169|            'branch_id'     => 'nullable|integer',
+170|            'department_id' => 'nullable|integer',
+171|            'reason'        => 'nullable|string|max:1000',
+172|        ]);
+173|
+174|        $visit = VisitRequest::withoutGlobalScopes()->findOrFail($id);
+175|
+176|        if (!$actor->hasCompanyAccess($visit->company_id)) {
+177|            abort(403, 'You do not have access to this visit\'s company.');
+178|        }
+179|
+180|        if (in_array($visit->status, ['completed', 'cancelled', 'no_show', 'checked_out'], true)) {
+181|            return back()->with('error', 'Cannot transfer a visit that is already completed, cancelled, no-show or checked out.');
+182|        }
+183|
+184|        if (!$actor->hasCompanyAccess($data['company_id'])) {
+185|            abort(403, 'You are not authorized for the selected company.');
+186|        }
+187|
+188|        $company = Company::withoutGlobalScopes()->find($data['company_id']);
+189|        if (!$company) {
+190|            return back()->with('error', 'The selected company does not exist.');
+191|        }
+192|
+193|        $branch = null;
+194|        if (($data['branch_id'] ?? null) !== null) {
+195|            $branch = Branch::withoutGlobalScopes()
+196|                ->where('id', $data['branch_id'])
+197|                ->where('company_id', $company->company_id)
+198|                ->first();
+199|            if (!$branch) {
+200|                return back()->with('error', 'The selected branch does not belong to the selected company.');
+201|            }
+202|        }
+203|
+204|        $department = null;
+205|        if (($data['department_id'] ?? null) !== null) {
+206|            $department = Department::withoutGlobalScopes()
+207|                ->where('id', $data['department_id'])
+208|                ->where('company_id', $company->company_id)
+209|                ->when($branch !== null, function ($q) use ($branch) {
+210|                    $q->where(function ($q2) use ($branch) {
+211|                        $q2->where('branch_id', $branch->id)->orWhereNull('branch_id');
+212|                    });
+213|                }, function ($q) {
+214|                    $q->whereNull('branch_id');
+215|                })
+216|                ->first();
+217|            if (!$department) {
+218|                return back()->with('error', 'The selected department does not belong to the selected branch/company.');
+219|            }
+220|        }
+221|
+222|        // The recipient must be an active user of the selected company. Regular
+223|        // Hosts are scoped by branch/department (company-level or stationed at
+224|        // the selected branch, and assigned to the selected department). Company
+225|        // Admins/CEOs are company-level recipients, so no branch/department
+226|        // scoping applies to them when no branch is selected; once a branch is
+227|        // selected the CEO is no longer eligible. This mirrors the exact rule
+228|        // used to build the recipient dropdown, so a listed recipient can never
+229|        // be rejected at confirm time.
+230|        $newHost = User::withoutGlobalScopes()
+231|            ->whereIn('role', ['host', 'admin', 'ceo'])
+232|            ->where('status', 'active')
+233|            ->where('company_id', $company->company_id)
+234|            ->where(function ($q) use ($branch, $department) {
+235|                $q->where(function ($q1) use ($branch) {
+236|                    $q1->where('role', 'admin');
+237|                    if ($branch === null) {
+238|                        $q1->orWhere('role', 'ceo');
+239|                    }
+240|                });
+241|                $q->orWhere(function ($q2) use ($branch, $department) {
+242|                    $q2->where('role', 'host');
+243|                    if ($branch !== null) {
+244|                        $q2->where(function ($q3) use ($branch) {
+245|                            $q3->whereNull('branch_id')->orWhere('branch_id', $branch->id);
+246|                        });
+247|                    }
+248|                    if ($department !== null) {
+249|                        $q2->where('department_id', $department->id);
+250|                    }
+251|                });
+252|            })
+253|            ->find($data['new_host_id']);
+254|
+255|        if (!$newHost) {
+256|            return back()->with('error', 'The selected user is not an active, eligible Host or Admin/CEO for the selected company/branch/department.');
+257|        }
+258|        if ($newHost->id === $visit->host_id) {
+259|            return back()->with('error', 'The visit is already assigned to the selected Host.');
+260|        }
+261|        if ($newHost->id === $actor->id) {
+262|            return back()->with('error', 'You cannot transfer the visit to yourself.');
+263|        }
+264|
+265|        // When no branch/department was selected, fall back to the new Host's
+266|        // own branch/department so the transfer record is always complete.
+267|        $effectiveBranchId = $branch?->id ?? $newHost->branch_id;
+268|        $effectiveDeptId = $department?->id ?? $newHost->department_id;
+269|
+270|        $previousHostId = $visit->host_id;
+271|
+272|        try {
+273|            $oldState = $visit->toArray();
+274|
+275|            DB::transaction(function () use ($visit, $newHost, $actor, $data, $previousHostId, $oldState, $company, $effectiveBranchId, $effectiveDeptId) {
+276|                $transfer = app(HostTransferService::class)->transfer($visit, $newHost, $actor, $data['reason'] ?? null, [
+277|                    'validateScope'     => false,
+278|                    'moveToHostCompany' => true,
+279|                    'company_id'        => $company->company_id,
+280|                    'branch_id'         => $effectiveBranchId,
+281|                    'department_id'     => $effectiveDeptId,
+282|                ]);
+283|
+284|                AuditLogger::log(
+285|                    'visitor_transferred',
+286|                    'visit_requests',
+287|                    $visit->id,
+288|                    $oldState,
+289|                    [
+290|                        'previous_host_id' => $previousHostId,
+291|                        'new_host_id'      => $newHost->id,
+292|                        'transferred_by'   => $actor->id,
+293|                        'reason'           => $data['reason'] ?? null,
+294|                        'company_id'       => $company->company_id,
+295|                        'branch_id'        => $effectiveBranchId,
+296|                        'department_id'    => $effectiveDeptId,
+297|                        'transfer_id'      => $transfer->id,
+298|                    ],
+299|                    $company->company_id,
+300|                    $effectiveBranchId
+301|                );
+302|            });
+303|
+304|            return back()->with('success', "Visitor transferred to Host {$newHost->name}.");
+305|        } catch (\Exception $e) {
+306|            return back()->with('error', $e->getMessage());
+307|        }
+308|    }
+309|
+310|    /**
+311|     * The acting company-level user (Admin or CEO) or abort.
+312|     */
+313|    protected function actorOrAbort(): User
+314|    {
+315|        $actor = Auth::guard('web')->user();

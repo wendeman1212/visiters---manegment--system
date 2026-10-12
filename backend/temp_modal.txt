@@ -1,0 +1,215 @@
+1|import React, { useEffect, useRef, useState } from 'react';
+2|import { router, usePage } from '@inertiajs/react';
+3|import AppIcon from '../../config/iconMap';
+4|
+5|/**
+6| * Visitor Transfer modal for Company Admin / CEO.
+7| *
+8| * Flow: Company -> Branch -> (optional Department filter) -> Host -> Reason -> Review -> Confirm.
+9| * Eligible users load as soon as a Company is selected (all eligible users of
+10| * that company). Selecting a Branch narrows the list to that branch's users,
+11| * and selecting a Department filters it to that department. A Department is
+12| * never required before users are shown. Everything is fetched from the
+13| * /visitor-transfer/{id}/options endpoint which validates each selection
+14| * against the live database for the acting Admin/CEO.
+15| */
+16|export default function VisitorTransferModal({ visit, onClose }) {
+17|    const { auth } = usePage().props;
+18|    const actor = auth?.user || {};
+19|
+20|    const [opts, setOpts] = useState(null);
+21|    const [loading, setLoading] = useState(false);
+22|    const [error, setError] = useState('');
+23|    const [sel, setSel] = useState({ company: '', branch: '', dept: '', host: '' });
+24|    const [reason, setReason] = useState('');
+25|    const [step, setStep] = useState('form');
+26|    const [submitting, setSubmitting] = useState(false);
+27|    const loadToken = useRef(0);
+28|
+29|    const buildUrl = (v, s) => {
+30|        const qs = [];
+31|        if (s.company) qs.push(`company_id=${encodeURIComponent(s.company)}`);
+32|        if (s.branch) qs.push(`branch_id=${encodeURIComponent(s.branch)}`);
+33|        if (s.dept) qs.push(`department_id=${encodeURIComponent(s.dept)}`);
+34|        const q = qs.length ? `?${qs.join('&')}` : '';
+35|        return `/visitor-transfer/${v.id}/options${q}`;
+36|    };
+37|
+38|    const readError = async (res) => {
+39|        try {
+40|            const data = await res.json();
+41|            if (data && data.message) return data.message;
+42|        } catch (_) { /* ignore */ }
+43|        return 'Failed to load transfer options.';
+44|    };
+45|
+46|    const load = async (s) => {
+47|        const token = ++loadToken.current;
+48|        setLoading(true);
+49|        setError('');
+50|        try {
+51|            const res = await fetch(buildUrl(visit, s), { headers: { Accept: 'application/json' } });
+52|            if (token !== loadToken.current) return;
+53|            if (!res.ok) throw new Error(await readError(res));
+54|            const data = await res.json();
+55|            setOpts(data);
+56|        } catch (err) {
+57|            if (token !== loadToken.current) return;
+58|            setError(err.message || 'Could not load transfer options.');
+59|        } finally {
+60|            if (token === loadToken.current) setLoading(false);
+61|        }
+62|    };
+63|
+64|    useEffect(() => {
+65|        load({ company: '', branch: '', dept: '' });
+66|        // eslint-disable-next-line react-hooks/exhaustive-deps
+67|    }, [visit?.id]);
+68|
+69|    const change = async (field, value) => {
+70|        const next = { ...sel, [field]: value };
+71|        if (field === 'company') { next.branch = ''; next.dept = ''; next.host = ''; }
+72|        if (field === 'branch') { next.dept = ''; next.host = ''; }
+73|        if (field === 'dept') { next.host = ''; }
+74|        setSel(next);
+75|        await load(next);
+76|    };
+77|
+78|    const review = () => {
+79|        if (!sel.host) { alert('Please select an eligible Host, Admin or CEO.'); return; }
+80|        setStep('review');
+81|    };
+82|
+83|    const confirm = () => {
+84|        setSubmitting(true);
+85|        router.post(`/visitor-transfer/${visit.id}`, {
+86|            new_host_id: sel.host,
+87|            company_id: sel.company,
+88|            branch_id: sel.branch,
+89|            department_id: sel.dept,
+90|            reason,
+91|        }, {
+92|            onFinish: () => setSubmitting(false),
+93|        });
+94|    };
+95|
+96|    const selectedRecipient = [...(opts?.managers || []), ...(opts?.hosts || [])].find(r => String(r.id) === String(sel.host));
+97|    const selectedCompany = (opts?.companies || []).find(c => String(c.company_id) === String(sel.company));
+98|    const selectedBranch = (opts?.branches || []).find(b => String(b.id) === String(sel.branch));
+99|    const selectedDept = (opts?.departments || []).find(d => String(d.id) === String(sel.dept));
+100|
+101|    const visitorName = visit?.visitor_name || visit?.visitor?.name || visit?.company_name || 'Visitor';
+102|    const currentHostName = visit?.host_name || visit?.host?.name || visit?.assigned_host_name || '—';
+103|    const status = visit?.status || '';
+104|
+105|    const fieldStyle = { width: '100%', fontSize: 13 };
+106|    const labelStyle = { fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 4, display: 'block' };
+107|
+108|    return (
+109|        <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={on..[207]
+110|            <div className="glass-card modal-content" style={{ width: 560, maxWidth: '92vw', padding: 24, border: '1px solid rgba(99,102,241,0.3)', maxHeight: '92vh', overflowY: 'auto' }} onClick={e =..[223]
+111|                <h3 style={{ fontWeight: 700, fontSize: 16, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+112|                    <AppIcon name="users" size={18} /> Transfer Visitor
+113|                </h3>
+114|
+115|                {visit && (
+116|                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 16, padding: '10px 12px', borderRadius: 8, background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99..[219]
+117|                        Visitor: <strong>{visitorName}</strong> · Current Host: <strong>{currentHostName}</strong>
+118|                        {status ? <> · Status: <span className={`badge badge-${status}`}>{status.replace(/_/g, ' ')}</span></> : null}
+119|                    </div>
+120|                )}
+121|
+122|                {loading && <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>Loading transfer options...</p>}
+123|                {error && <p style={{ color: 'var(--status-danger)', fontSize: 13 }}>{error}</p>}
+124|
+125|                {opts && !opts.error && step === 'form' && (
+126|                    <form onSubmit={e => { e.preventDefault(); review(); }}>
+127|                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
+128|                            <div>
+129|                                <label style={labelStyle}>Company</label>
+130|                                <select className="form-input" style={fieldStyle} value={sel.company} onChange={e => change('company', e.target.value)}>
+131|                                    <option value="">Select company...</option>
+132|                                    {(opts.companies || []).map(c => <option key={c.company_id} value={c.company_id}>{c.company_name}</option>)}
+133|                                </select>
+134|                            </div>
+135|                            <div>
+136|                                <label style={labelStyle}>Branch</label>
+137|                                <select className="form-input" style={fieldStyle} value={sel.branch} onChange={e => change('branch', e.target.value)} disabled={!sel.company}>
+138|                                    <option value="">Select branch...</option>
+139|                                    {(opts.branches || []).map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+140|                                    {(opts.branches || []).length === 0 && sel.company && <option value="" disabled>No branches available</option>}
+141|                                </select>
+142|                            </div>
+143|                            <div>
+144|                                <label style={labelStyle}>Department</label>
+145|                                <select className="form-input" style={fieldStyle} value={sel.dept} onChange={e => change('dept', e.target.value)} disabled={!sel.company || loading}>
+146|                                    <option value="">{sel.branch ? 'Select department (this branch)...' : 'Select department (company-level)...'}</option>
+147|                                    {(opts.departments || []).map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+148|                                    {(opts.departments || []).length === 0 && sel.company && !loading && <option value="" disabled>No departments available</option>}
+149|                                </select>
+150|                            </div>
+151|                            <div>
+152|                                <label style={labelStyle}>New Host / Recipient</label>
+153|                                <select className="form-input" style={fieldStyle} value={sel.host} onChange={e => change('host', e.target.value)} disabled={!sel.company || loading}>
+154|                                    <option value="">{loading ? 'Loading recipients...' : (sel.company ? 'Select a Host, Admin or CEO...' : 'Select a company first')}</option>
+155|                                    {(opts.managers || []).length > 0 && (
+156|                                        <optgroup label="Admins / CEO">
+157|                                            {(opts.managers || []).map(m => <option key={m.id} value={m.id}>{m.name}{m.role === 'ceo' ? ' (CEO)' : ' (Admin)'}{m.department ? ` — ${m.department}` : '..[213]
+158|                                        </optgroup>
+159|                                    )}
+160|                                    {(opts.hosts || []).length > 0 && (
+161|                                        <optgroup label="Active Hosts">
+162|                                            {(opts.hosts || []).map(h => <option key={h.id} value={h.id}>{h.name}{h.department ? ` — ${h.department}` : ''}</option>)}
+163|                                        </optgroup>
+164|                                    )}
+165|                                    {!loading && sel.company && (opts.managers || []).length === 0 && (opts.hosts || []).length === 0 && <option value="" disabled>No eligible recipients found</option>..[201]
+166|                                </select>
+167|                            </div>
+168|                        </div>
+169|
+170|                        <label style={labelStyle}>Transfer Reason</label>
+171|                        <textarea className="form-input" style={{ width: '100%', fontSize: 13, minHeight: 64, marginBottom: 14 }} placeholder="Reason for transfer (optional)" value={reason} onChange={..[234]
+172|
+173|                        <div style={{ padding: '10px 12px', borderRadius: 8, background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)', marginBottom: 16, fontSize: 11, color: 'var..[223]
+174|                            The selected user becomes responsible for this visitor immediately. All visit, approval, property, appointment and history records are preserved. The visitor and the new us..[216]
+175|                        </div>
+176|
+177|                        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+178|                            <button type="button" onClick={onClose} className="btn btn-secondary">Cancel</button>
+179|                            <button type="submit" className="btn btn-primary" disabled={!sel.host}>Review Transfer</button>
+180|                        </div>
+181|                    </form>
+182|                )}
+183|
+184|                {opts && !opts.error && step === 'review' && (
+185|                    <div>
+186|                        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>Review Transfer</div>
+187|                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+188|                            {[
+189|                                ['Visitor', visitorName],
+190|                                ['Current Host', currentHostName],
+191|                                ['New Recipient', selectedRecipient ? `${selectedRecipient.name}${selectedRecipient.role === 'ceo' ? ' (CEO)' : selectedRecipient.role === 'admin' ? ' (Admin)' : ''}${s..[283]
+192|                                ['Company', selectedCompany?.company_name || '—'],
+193|                                ['Branch', selectedBranch?.name || '—'],
+194|                                ['Department', selectedDept?.name || '—'],
+195|                                ['Reason', reason || '—'],
+196|                                ['Transferred By', `${actor.name || ''} (${actor.role === 'ceo' ? 'CEO' : 'Admin'})`],
+197|                            ].map(([k, v]) => (
+198|                                <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '8px 10px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1p..[235]
+199|                                    <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 }}>{k}</span>
+200|                                    <span style={{ fontSize: 12, textAlign: 'right', fontWeight: 600 }}>{v}</span>
+201|                                </div>
+202|                            ))}
+203|                        </div>
+204|                        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+205|                            <button type="button" onClick={() => setStep('form')} className="btn btn-secondary">Back</button>
+206|                            <button type="button" onClick={confirm} className="btn btn-primary" disabled={submitting}>
+207|                                <AppIcon name="check" size={14} /> {submitting ? 'Transferring...' : 'Confirm Transfer'}
+208|                            </button>
+209|                        </div>
+210|                    </div>
+211|                )}
+212|            </div>
+213|        </div>
+214|    );
+215|}

@@ -1,0 +1,55 @@
+1|<?php
+2|
+3|namespace App\Http\Controllers;
+4|
+5|use App\Models\VisitRequest;
+6|use App\Models\User;
+7|use App\Services\HostTransferService;
+8|use Illuminate\Http\Request;
+9|use Illuminate\Support\Facades\Auth;
+10|
+11|class HostTransferController extends Controller
+12|{
+13|    protected $transferService;
+14|
+15|    public function __construct(HostTransferService $transferService)
+16|    {
+17|        $this->transferService = $transferService;
+18|    }
+19|
+20|    public function store(Request $request)
+21|    {
+22|        $request->validate([
+23|            'visit_request_id' => 'required|exists:visit_requests,id',
+24|            'new_host_id' => 'required|exists:users,id',
+25|            'reason' => 'nullable|string|max:1000',
+26|        ]);
+27|
+28|        $visitRequest = VisitRequest::findOrFail($request->visit_request_id);
+29|        $newHost = User::findOrFail($request->new_host_id);
+30|
+31|        // Only active Host, Admin or CEO users can receive a transferred visitor.
+32|        if (!in_array($newHost->role, ['host', 'admin', 'ceo'], true) || $newHost->status !== 'active') {
+33|            return back()->with('error', 'The selected user is not eligible to receive a visitor transfer.');
+34|        }
+35|
+36|        // Authorization: only admin or current host can transfer
+37|        $user = Auth::user();
+38|        if ($user->role !== 'admin' && $visitRequest->host_id != $user->id) {
+39|            abort(403, 'You are not authorized to transfer this visit.');
+40|        }
+41|
+42|        try {
+43|            $this->transferService->transfer(
+44|                $visitRequest,
+45|                $newHost,
+46|                $user,
+47|                $request->reason
+48|            );
+49|
+50|            return back()->with('success', "Visit transferred to {$newHost->name}.");
+51|        } catch (\Exception $e) {
+52|            return back()->with('error', $e->getMessage());
+53|        }
+54|    }
+55|}

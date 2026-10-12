@@ -1,0 +1,22 @@
+=== 1) HOST->HOST visit #120 (host=12) ===
+  result=302
+  state: host=33 alt=NULL status=pending
+  oldHost(12) sees: #49:archived #108:pending #109:pending #110:pending #111:pending #112:pending #113:pending #117:pending #118:pending #119:pending
+  newHost(33) sees: #89:approved #99:checked_in #107:pending #114:pending #116:approved #120:pending
+=== 2) ADMIN->HOST visit #121 (host=12) ===
+  result=302
+  state: host=33 alt=NULL status=pending
+  oldHost(12) sees: #49:archived #108:pending #109:pending #110:pending #111:pending #112:pending #113:pending #117:pending #118:pending #119:pending
+  newHost(33) sees: #89:approved #99:checked_in #107:pending #114:pending #116:approved #120:pending #121:pending
+=== 3) CEO->HOST visit #122 (host=12) ===
+  result=302
+  state: host=33 alt=NULL status=pending
+  oldHost(12) sees: #49:archived #108:pending #109:pending #110:pending #111:pending #112:pending #113:pending #117:pending #118:pending #119:pending
+  newHost(33) sees: #89:approved #99:checked_in #107:pending #114:pending #116:approved #120:pending #121:pending #122:pending
+=== 4) approve then transfer visit #123 ===
+  approve result=302
+  after approve: host=12 status=approved
+  transfer result=302
+  state: host=33 alt=NULL status=approved
+  oldHost(12) sees: #49:archived #108:pending #109:pending #110:pending #111:pending #112:pending #113:pending #117:pending #118:pending #119:pending
+  newHost(33) sees: #89:approved #99:checked_in #107:pending #114:pending #116:approved #120:pending #121:pending #122:pending #123:approved

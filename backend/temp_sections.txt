@@ -1,0 +1,108 @@
+205|            return companyId ? u.company_id === companyId : true;
+206|        });
+207|    };
+208|
+209|    // ── Filters ──
+210|    const filterVisits = (group) => visits.filter(v => {
+211|        if (group === 'pending') return v.status === 'pending';
+212|        if (group === 'approved') return v.status === 'approved';
+213|        if (group === 'checked_in') return v.status === 'checked_in';
+214|        if (group === 'today') return new Date(v.requested_time).toDateString() === new Date().toDateString();
+215|        if (group === 'upcoming') return v.status === 'approved' && new Date(v.requested_time) > new Date();
+216|        if (group === 'missed') return v.is_no_show;
+217|        if (group === 'completed') return ['checked_out', 'archived'].includes(v.status);
+218|        if (group === 'vip') return v.is_vip;
+219|        if (group === 'all') return true;
+220|        return false;
+221|    });
+222|
+223|    // ── Handlers ──
+224|    const decide = (id, decision, extra = {}) => {
+225|        router.post(`/visit-requests/${id}/host-decision`, { decision, comments, ...extra },
+226|            { onSuccess: () => { setComments(''); } });
+227|    };
+228|
+229|    const toggleEdit = (id, time, dur) => {
+230|        setEditOpen(p => ({ ...p, [id]: !p[id] }));
+231|        if (!editState[id]) {
+232|            setEditState(p => ({ ...p, [id]: { requested_time: toLocalDatetimeInput(time), duration: dur } }));
+233|        }
+234|    };
+235|    const saveTime = (id) => {
+236|        const s = editState[id];
+237|        if (!s?.requested_time || !s?.duration) return;
+238|        const serverTime = localToServerDatetime(s.requested_time, tz);
+239|        router.post(`/visit-requests/${id}/update-time`, { requested_time: serverTime, duration: s.duration },
+240|            { onSuccess: () => setEditOpen(p => ({ ...p, [id]: false })) });
+241|    };
+242|
+243|    const toggleSelect = (id) => setSelectedIds(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+244|    const selectAll = (group) => {
+245|        const ids = filterVisits(group).map(v => v.id);
+246|        setSelectedIds(ids);
+---- APPOINTMENTS TAB ----
+896|                    {/* ══════ APPOINTMENTS TAB ══════ */}
+897|                    {tab === 'appointments' && (
+898|                        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+899|                            <div className="glass-card">
+900|                                <SectionTitle> Meeting Calendar View</SectionTitle>
+901|                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 8, marginBottom: 16 }}>
+902|                                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
+903|                                        <div key={d} style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, padding: '6px 0', textTransform: 'uppercase', letterSpacin..[217]
+904|                                    ))}
+905|                                </div>
+906|                                {/* Today's schedule timeline */}
+907|                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+908|                                    {filterVisits('today').length === 0 ? (
+909|                                        <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>No visits scheduled for today.</p>
+910|                                    ) : filterVisits('today').map(v => (
+911|                                        <div key={v.id} style={{ display: 'flex', gap: 16, alignItems: 'center', padding: '12px 16px', borderRadius: 10, background: v.status === 'checked_in' ? 'rgba(9..[290]
+912|                                            <div style={{ minWidth: 60, textAlign: 'center' }}>
+913|                                                <div style={{ fontWeight: 800, color: 'var(--accent-primary)', fontSize: 16 }}>{fmtTime(v.requested_time)}</div>
+914|                                                <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>{v.duration}min</div>
+915|                                            </div>
+916|                                            <div style={{ width: 3, alignSelf: 'stretch', background: priorityColor[v.priority] || '#6366f1', borderRadius: 3 }} />
+917|                                            <div style={{ flex: 1 }}>
+918|                                                <div style={{ fontWeight: 600 }}>{v.visitor.name}</div>
+919|                                                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{v.purpose} · {formatLocation(v.building, v.floor, v.meeting_room_id) || 'No location'}</..[204]
+920|                                            </div>
+921|                                            <span className={`badge badge-${v.status}`}>{v.status.replace(/_/g, ' ')}</span>
+922|                                        </div>
+923|                                    ))}
+924|                                </div>
+925|                            </div>
+926|
+927|                            {/* Upcoming visits */}
+928|                            <div className="glass-card">
+929|                                <SectionTitle> Upcoming Approved Appointments</SectionTitle>
+930|                                {filterVisits('upcoming').length === 0 ? (
+931|                                    <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>No upcoming approved appointments.</p>
+932|                                ) : (
+933|                                    <div className="table-container" style={{ marginBottom: 0 }}>
+934|                                        <table className="data-table">
+935|                                            <thead><tr><th>Visitor</th><th>Purpose</th><th>Date & Time</th><th>Duration</th><th>Facility</th><th>Priority</th><th>QR Token</th></tr></thead>
+936|                                            <tbody>
+937|                                                {filterVisits('upcoming').map(v => (
+938|                                                    <tr key={v.id}>
+939|                                                        <td><div style={{ fontWeight: 600 }}>{v.visitor.name}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{v.visitor.email}</div></td..[201]
+940|                                                        <td>{v.purpose}</td>
+941|                                                        <td style={{ whiteSpace: 'nowrap' }}>{fmt(v.requested_time)}</td>
+942|                                                        <td>{v.duration} min</td>
+943|                                                        <td>{formatLocation(v.building, v.floor, v.meeting_room_id) || '—'}</td>
+944|                                                        <td><span style={{ color: priorityColor[v.priority], fontWeight: 700, fontSize: 12 }}>{priorityIcon[v.priority]} {v.priority}</span></td>
+945|                                                        <td style={{ fontSize: 11, fontFamily: 'monospace', color: 'var(--accent-cyan)' }}>{v.qr_token?.token_value || '—'}</td>
+946|                                                    </tr>
+947|                                                ))}
+948|                                            </tbody>
+949|                                        </table>
+950|                                    </div>
+951|                                )}
+952|                            </div>
+953|                        </div>
+954|                    )}
+955|
+956|                    {/* ══════ HOST CHANGE TAB ══════ */}
+957|                    {tab === 'host_change' && (
+958|                        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+959|                            {/* Pending Incoming Host Change Requests */}
+960|                            <div className="glass-card">

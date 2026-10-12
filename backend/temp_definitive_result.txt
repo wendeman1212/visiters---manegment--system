@@ -1,0 +1,60 @@
+visitor #45 co=NULL
+---
+admin #2 selam (co=3)
+ceo #1 CEO User (co=3)
+hostA #12 (co=3 br=1 dept=4)
+hostB #33 (co=3 br=2 dept=15)
+
+=== S1: Host #12 transfer visit #159 to Admin #2 via /transfer ===
+  before: host=12 alt=NULL status=pending escalated_to=NULL
+  status=302 body=<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='/h flashErr=
+  after:  host=2 alt=NULL status=pending escalated_to=NULL
+
+=== S2: Host #12 transfer visit #160 to CEO #1 via /transfer ===
+  before: host=12 alt=NULL status=pending escalated_to=NULL
+  status=302 body=<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='/h flashErr=
+  after:  host=1 alt=NULL status=pending escalated_to=NULL
+
+=== S3: Host #33 transfer visit #161 (owned by host #12) via /transfer ===
+  before: host=12 alt=NULL status=pending escalated_to=NULL
+  status=403 body={
+    "message": "You are not authorized to transfer this visit.",
+    "exception": "Symfony\\Component\\HttpKernel\\Exception\\HttpException",
+    "file": "C:\ flashErr=
+  after:  host=12 alt=NULL status=pending escalated_to=NULL
+
+=== S4: Host #12 escalate visit #162 to CEO #1 via /host-decision ===
+  before: host=12 alt=NULL status=pending escalated_to=NULL
+  status=302 body=<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='/host/dashboard'" />
+
+        <title>Redir flashErr=
+  after:  host=1 alt=NULL status=escalated escalated_to=1
+
+=== S5: Host #12 approve own visit #163 ===
+  status=302 body=<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="refresh" content="0;url='/host/dashboard'" />
+
+        <title>Redir flashErr=
+  after:  host=12 alt=NULL status=approved escalated_to=NULL
+
+=== S6: Host #33 approve visit #164 (owned by A) ===
+  status=403 body={
+    "message": "You can only act on your own visit requests.",
+    "exception": "Symfony\\Component\\HttpKernel\\Exception\\HttpException",
+    "file": "C:\\xampp\\htdocs\\project - kiro - 1 - Copy  flashErr=
+  after:  host=12 alt=NULL status=pending escalated_to=NULL

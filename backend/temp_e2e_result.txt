@@ -1,0 +1,20 @@
+admin #2 selam
+ceo #1 CEO User
+hostA #12 br=1 dept=4
+hostB #33 br=1 dept=15
+created visit #111
+ADMIN transfer EX: The company id field is required.
+after admin transfer: host=12 alt=NULL status=pending company=3 br=1 dept=4
+  hostA dash: no-json 409 
+  hostB dash: no-json 409 
+HOSTB approve EX: You can only act on your own visit requests.
+after approve: status=pending host=12
+  hostB dash: no-json 409 
+HOST handoff EX: The visit request id field is required.
+after host transfer: host=12 alt=NULL status=pending
+  hostA dash: no-json 409 
+  hostB dash: no-json 409 
+created visit2 #112
+CEO transfer EX: The company id field is required.
+after ceo transfer: host=12 status=pending
+  hostB dash: no-json 409 

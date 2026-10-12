@@ -1,0 +1,3 @@
+reset #12 meki@gmail.com role=host
+reset #33 tale@gmail.com role=host
+reset #2 selam@gmail.com role=admin
